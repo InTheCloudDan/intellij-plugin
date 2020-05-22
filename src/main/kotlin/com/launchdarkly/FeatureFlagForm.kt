@@ -1,5 +1,11 @@
 package com.launchdarkly
 
+import com.intellij.ui.JBIntSpinner
+import com.intellij.ui.components.CheckBox
+import com.intellij.ui.layout.panel
+import com.intellij.util.ui.CheckBox
+import javax.swing.*
+
 fun visualPaddingsPanel(): JPanel {
     // we use growX to test right border
     return panel {
