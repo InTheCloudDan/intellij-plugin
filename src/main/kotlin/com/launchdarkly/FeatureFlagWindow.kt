@@ -17,7 +17,7 @@ class FeatureFlagWindow(toolWindow: ToolWindow) {
     private val currentDate: JLabel = JLabel()
     private val currentTime: JLabel = JLabel()
     private val timeZone: JLabel = JLabel()
-    val content: JPanel = JPanel()
+    lateinit var content: JPanel
 
     fun currentDateTime() {
         // Get current date and time
@@ -39,7 +39,7 @@ class FeatureFlagWindow(toolWindow: ToolWindow) {
     }
 
     init {
-        visualPaddingsPanel()
+        content = visualPaddingsPanel()
         hideToolWindowButton.addActionListener { e: ActionEvent -> toolWindow.hide(null) }
         refreshToolWindowButton.addActionListener { e: ActionEvent -> currentDateTime() }
         currentDateTime()
