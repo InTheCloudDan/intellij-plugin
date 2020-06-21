@@ -7,20 +7,28 @@ import com.intellij.openapi.components.Storage
 import com.intellij.openapi.options.BoundConfigurable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
+import com.intellij.ui.layout.panel
 import com.intellij.util.xmlb.XmlSerializerUtil;
+import javax.swing.JPasswordField
 import javax.swing.JTextField
 
 
 @State(name = "LaunchDarklyConfig", storages = arrayOf(Storage(file = "launchdarkly.xml")))
 class LaunchDarklyConfig : PersistentStateComponent<LaunchDarklyConfig.State> {
-    var settings: State = State()
+    var myState = State()
+
+    companion object {
+        fun getInstance(project: Project): LaunchDarklyConfig {
+            return ServiceManager.getService(project, LaunchDarklyConfig::class.java)
+        }
+    }
 
     override fun getState(): State {
-        return settings
+        return myState
     }
 
     override fun loadState(state: State) {
-        XmlSerializerUtil.copyBean(state, this);
+        XmlSerializerUtil.copyBean(LaunchDarklyConfig, this);
     }
 
     data class State(
@@ -30,11 +38,11 @@ class LaunchDarklyConfig : PersistentStateComponent<LaunchDarklyConfig.State> {
 }
 
 class LaunchDarklyConfigurable(private val project: Project): BoundConfigurable(displayName = "LaunchDarkly Plugin") {
-    private val settings = ServiceManager.getService(project, LaunchDarklyConfig::class.java)
-    private val ldProject = JTextField(settings.settings.project)
+    private val settings = LaunchDarklyConfig.getInstance(project)
+    private val ldProject = JTextField(settings.state.project)
     private var myPanel: DialogPanel = launchDarklySettingsPanel(ldProject)
 
-    override fun getHelpTopic() = null
+//    override fun getHelpTopic() = null
 
     override fun createPanel(): DialogPanel {
         return myPanel
@@ -44,14 +52,14 @@ class LaunchDarklyConfigurable(private val project: Project): BoundConfigurable(
 //            row("Environment:") { JTextField("text")() }
 //            row("API Key:") { JPasswordField("secret")() }
 //        }
-
+//
     override fun isModified(): Boolean {
-        return settings.settings.project != ldProject.text
+        return settings.state.project != ldProject.text
     }
 
-    override fun apply() {
-        myPanel.apply()
-    }
+//    override fun apply() {
+//        myPanel.apply()
+//    }
 
 //    override fun dispose() {
 //        myPanel = null
