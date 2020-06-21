@@ -14,8 +14,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="LaunchDarkly Feature Flags" anchor="right" factoryClass="com.launchdarkly.FeatureFlagWindowFactory"/>
         <projectService serviceImplementation="com.launchdarkly.LaunchDarklyConfig"/>
-        <projectConfigurable instance="com.launchdarkly.LaunchDarklyConfigurable" displayName="LaunchDarkly Plugin" id="launchdarkly.settings"
-                             nonDefaultProject="true"/>
+        <projectConfigurable instance="com.launchdarkly.LaunchDarklyConfigurable" displayName="LaunchDarkly Plugin" id="launchdarkly.settings"/>
     </extensions>
 
     <actions>

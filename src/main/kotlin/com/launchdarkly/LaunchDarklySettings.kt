@@ -35,14 +35,13 @@ import javax.swing.*
 class LaunchDarklyConfig : PersistentStateComponent<LaunchDarklyConfig.State> {
     var settings: State = State()
 
-    override fun getState(): State? {
-        return State(state!!.project, state!!.environment)
+    override fun getState(): State {
+        return State(project = state.project, environment = state.environment)
     }
 
     override fun loadState(state: State) {
         state.project = state.project ?: ""
         state.environment = state.environment ?: ""
-
     }
 
     data class State(
@@ -70,10 +69,7 @@ class LaunchDarklyConfigurable() : BoundConfigurable(displayName = "LaunchDarkly
     }
 
     override fun apply() {
-        settings.settings?.project = project?.text
-    }
+        settings.settings.project = project?.text
 
-    private fun isDigitsOnly(string: String): Boolean {
-        return string.all { c -> c.isDigit() }
     }
 }
