@@ -5,21 +5,22 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.options.BoundConfigurable
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
-import com.intellij.ui.layout.panel
-import javax.swing.*
+import com.intellij.util.xmlb.XmlSerializerUtil;
+import javax.swing.JTextField
+
 
 @State(name = "LaunchDarklyConfig", storages = arrayOf(Storage(file = "launchdarkly.xml")))
 class LaunchDarklyConfig : PersistentStateComponent<LaunchDarklyConfig.State> {
     var settings: State = State()
 
     override fun getState(): State {
-        return State(project = state.project, environment = state.environment)
+        return settings
     }
 
     override fun loadState(state: State) {
-        state.project = state.project ?: ""
-        state.environment = state.environment ?: ""
+        XmlSerializerUtil.copyBean(state, this);
     }
 
     data class State(
@@ -28,26 +29,31 @@ class LaunchDarklyConfig : PersistentStateComponent<LaunchDarklyConfig.State> {
     )
 }
 
-class LaunchDarklyConfigurable() : BoundConfigurable(displayName = "LaunchDarkly Plugin") {
-    private val settings = ServiceManager.getService(LaunchDarklyConfig::class.java)
-    private val project = JTextField(settings.settings.project)
+class LaunchDarklyConfigurable(private val project: Project): BoundConfigurable(displayName = "LaunchDarkly Plugin") {
+    private val settings = ServiceManager.getService(project, LaunchDarklyConfig::class.java)
+    private val ldProject = JTextField(settings.settings.project)
+    private var myPanel: DialogPanel = launchDarklySettingsPanel(ldProject)
 
     override fun getHelpTopic() = null
 
     override fun createPanel(): DialogPanel {
-        return panel {
-            row("Project:") { project() }
-            row("Environment:") { JTextField("text")() }
-            row("API Key:") { JPasswordField("secret")() }
-        }
+        return myPanel
     }
+//        return panel {
+//            row("Project:") { ldProject() }
+//            row("Environment:") { JTextField("text")() }
+//            row("API Key:") { JPasswordField("secret")() }
+//        }
 
     override fun isModified(): Boolean {
-        return project.text != "blue"
+        return settings.settings.project != ldProject.text
     }
 
     override fun apply() {
-        settings.settings.project = project?.text
-
+        myPanel.apply()
     }
+
+//    override fun dispose() {
+//        myPanel = null
+//    }
 }
