@@ -12,13 +12,14 @@
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <!-- Add your extensions here -->
+        <toolWindow id="LaunchDarkly Feature Flags" anchor="right" factoryClass="com.launchdarkly.FeatureFlagWindowFactory"/>
+        <projectConfigurable instance="com.launchdarkly.LaunchDarklyConfigurable" displayName="LaunchDarkly Plugin" id="launchdarkly.settings"
+                             nonDefaultProject="true"/>
     </extensions>
 
     <actions>
         <!-- Add your actions here -->
     </actions>
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="My Sample Tool Window" anchor="right" factoryClass="com.launchdarkly.FeatureFlagWindowFactory"/>
     </extensions>
 </idea-plugin>
