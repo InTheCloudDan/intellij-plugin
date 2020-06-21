@@ -11,54 +11,66 @@ import com.intellij.openapi.components.Storage
 import com.intellij.openapi.keymap.Keymap
 import com.intellij.openapi.keymap.KeymapManager
 import com.intellij.openapi.keymap.ex.KeymapManagerEx
-import com.intellij.openapi.options.Configurable
+import com.intellij.openapi.options.BoundConfigurable
 import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ComboBox
+import com.intellij.openapi.ui.DialogPanel
 import com.intellij.ui.SimpleListCellRenderer
+import com.intellij.ui.layout.panel
 import com.intellij.util.ui.FormBuilder
 import com.intellij.util.ui.UIUtil
 import com.intellij.util.xmlb.XmlSerializerUtil
 import java.awt.BorderLayout
 import java.awt.FlowLayout
+import java.awt.TextField
 import javax.swing.*
 
-class LaunchDarklyState {
-    var fontSize = 24
-    var hideDelay = 4*1000
-}
+//class LaunchDarklySettings {
+//    var project: String = ""
+//    var environment = ""
+//}
 
 @State(name = "LaunchDarklyConfig", storages = arrayOf(Storage(file = "launchdarkly.xml")))
-class LaunchDarklyConfig : PersistentStateComponent<LaunchDarklyState>, Disposable {
-    val configuration = LaunchDarklyState()
+class LaunchDarklyConfig : PersistentStateComponent<LaunchDarklyConfig.State> {
+    var settings: State = State()
 
-    override fun getState() = configuration
-    override fun loadState(p: LaunchDarklyState) {
-        XmlSerializerUtil.copyBean(p, configuration)
+    override fun getState(): State? {
+        return State(state!!.project, state!!.environment)
     }
 
-    override fun dispose() {}
+    override fun loadState(state: State) {
+        state.project = state.project ?: ""
+        state.environment = state.environment ?: ""
+
+    }
+
+    data class State(
+        var project: String = "",
+        var environment: String = ""
+    )
 }
 
-fun getLaunchDarkly(): LaunchDarklyConfig = ServiceManager.getService(LaunchDarklyConfig::class.java)
+class LaunchDarklyConfigurable() : BoundConfigurable(displayName = "LaunchDarkly Plugin") {
+    private val settings = ServiceManager.getService(LaunchDarklyConfig::class.java)
+    private val project = JTextField("")
 
-class LaunchDarklyConfigurable : Configurable, SearchableConfigurable {
-    private val mainPanel: JPanel = settingsPanel()
-
-    override fun getId() = displayName
-    override fun enableSearch(option: String?) = null
-    override fun getDisplayName() = "LaunchDarkly Plugin"
     override fun getHelpTopic() = null
 
-    override fun createComponent() = mainPanel
+    override fun createPanel(): DialogPanel {
+        return panel {
+            row("Project:") { project() }
+            row("Environment:") { JTextField("text")() }
+            row("API Key:") { JPasswordField("secret")() }
+        }
+    }
 
-    override fun isModified() = true
+    override fun isModified(): Boolean {
+        return project.text != "blue"
+    }
 
-    override fun apply() {}
-
-    override fun reset() {}
-
-    override fun disposeUIResources() {
+    override fun apply() {
+        settings.settings?.project = project?.text
     }
 
     private fun isDigitsOnly(string: String): Boolean {
